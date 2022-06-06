@@ -56,7 +56,7 @@ def normalize_gross(imbd_data):
 
 
 def prepare_dataset():
-    df = pd.read_csv('data/imdb_top_1000.csv')
+    df = pd.read_csv('imdb_top_1000.csv')
     df = drop_relevant_columns(df)
     df_lowercase = lowercase_columns_names(df)
     df = data_to_numeric(df_lowercase)
@@ -124,6 +124,12 @@ evr = explained_variance_score(gross_test_g, pred)
 mae = mean_absolute_error(gross_test_g, pred)
 
 res = f"Explained variance regression score: {evr}, RMSE: {rmse}, MSE: {mse}, MAE: {mae}"
+
+with open("metrics.txt", "w") as f:
+    f.write("MAE " + str(mae) + '\n')
+    f.write("RMSE " + str(rmse) + '\n')
+    f.write("MSE " + str(mse) + '\n')
+    f.write("EVR " + str(evr) + '\n')
 
 with open('mae.txt', 'a+') as f:
     f.write(str(mae) + '\n')

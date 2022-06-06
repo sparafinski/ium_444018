@@ -56,7 +56,7 @@ def normalize_gross(imbd_data):
 
 
 def prepare_dataset():
-    df = pd.read_csv('data/imdb_top_1000.csv')
+    df = pd.read_csv('imdb_top_1000.csv')
     df = drop_relevant_columns(df)
     df_lowercase = lowercase_columns_names(df)
     df = data_to_numeric(df_lowercase)
@@ -100,8 +100,8 @@ l = nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 
-# num_epochs = 1000
-num_epochs = int(sys.argv[1])
+num_epochs = 1000
+# num_epochs = int(sys.argv[1])
 
 for epoch in range(num_epochs):
     # forward feed
@@ -122,10 +122,10 @@ for epoch in range(num_epochs):
     if epoch % 100 == 0:
         print('epoch {}, loss {}'.format(epoch, loss.item()))
 
-predicted = model(X_train).detach().numpy()
-
-pred = pd.DataFrame(predicted)
-pred.to_csv('result.csv')
+# predicted = model(X_train).detach().numpy()
+#
+# pred = pd.DataFrame(predicted)
+# pred.to_csv('result.csv')
 
 # save model
 torch.save(model, "model.pkl")
