@@ -1,0 +1,4 @@
+outs:
+- md5: e60bed35070c834405e43c5930a28191
+  size: 438096
+  path: imdb_top_1000.csv

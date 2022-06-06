@@ -1,0 +1,9 @@
+stages:
+  train:
+    cmd: python3 ./lab6/biblioteka_DL/dllib.py 100
+    deps:
+    - data/imdb_top_1000.csv
+  evaluate:
+    cmd: python3 ./lab6/biblioteka_DL/evaluate.py
+    deps:
+    - data/imdb_top_1000.csv

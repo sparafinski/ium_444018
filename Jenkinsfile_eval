@@ -1,0 +1,46 @@
+pipeline {
+  	agent {
+		docker {
+			image 'docker_image'
+		}
+	}
+	parameters {
+	    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'BRANCH', type: 'PT_BRANCH'
+		buildSelector(
+			defaultSelector: lastSuccessful(),
+			description: 'Which build to use for copying artifacts',
+			name: 'BUILD_SELECTOR'
+		)
+	}
+   stages {
+	stage('Script'){
+		steps {
+                copyArtifacts filter: '*', projectName: 's444018-create-dataset', selector: buildParameter('BUILD_SELECTOR')
+                copyArtifacts filter: '*', projectName: 's444018-training/${BRANCH}', selector: buildParameter('BUILD_SELECTOR')
+                copyArtifacts filter: '*', projectName: 's444018-evaluation/master', selector: buildParameter('BUILD_SELECTOR'), optional: true
+			          sh 'python3 ./biblioteka_DL/evaluate.py'
+			          archiveArtifacts artifacts: 'mae.txt, rmse.txt, mse.txt, evr.txt, metrics.png', followSymlinks: false
+			script {
+                       	    	MAE = sh (
+                            	script: 'tail -1 mae.txt',
+                        	     returnStdout: true
+                            	).trim()
+                    	}
+		}
+	}
+    }
+    post {
+        success {
+            emailext body: "SUCCESS, MAE = ${MAE}", subject: 's444018-evaluation', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+        }
+        failure {
+            emailext body: "FAILURE, MAE = ${MAE}", subject: 's444018-evaluation', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+        }
+        unstable {
+            emailext body: "UNSTABLE, MAE = ${MAE}", subject: 's444018-evaluation', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+        }
+        changed {
+            emailext body: "CHANGED, MAE = ${MAE}", subject: 's444018-evaluation', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+        }
+    }
+}

@@ -1,0 +1,29 @@
+pipeline {
+    agent {
+        docker {
+			image 'docker_image'
+		}
+    }
+    parameters {
+        buildSelector(
+          defaultSelector: lastSuccessful(),
+          description: 'Which build to use for copying artifacts for predict',
+          name: 'BUILD_SELECTOR')
+        string(
+            defaultValue: '{\\"inputs\\": [900.0]}',
+            description: 'Input file',
+            name: 'INPUT',
+            trim: true
+        )
+    }
+
+    stages {
+        stage('Script') {
+            steps {
+                copyArtifacts projectName: 's444409-training/main', selector: buildParameter('BUILD_SELECTOR')
+		        sh "echo ${params.INPUT} > input_example.json"
+		        sh "python3 predict.py"
+            }
+        }
+    }
+}

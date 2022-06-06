@@ -1,0 +1,38 @@
+pipeline {
+  	agent {
+      dockerfile {
+			 additionalBuildArgs "--build-arg KAGGLE_USERNAME=${params.KAGGLE_USERNAME} --build-arg KAGGLE_KEY=${params.KAGGLE_KEY} --build-arg CUTOFF=${params.CUTOFF} -t docker_image"
+		}
+	}
+	parameters {
+    string(
+            defaultValue: '1000',
+            description: 'Number of epochs',
+            name: 'EPOCHS',
+            trim: false
+        )
+        }
+   stages {
+    stage('Script'){
+      steps {
+        copyArtifacts filter: '*', projectName: 's444018-create-dataset'
+        sh 'python3 ./biblioteka_DL/dllib.py $EPOCHS'
+        archiveArtifacts artifacts: 'model.pkl', followSymlinks: false
+		      }
+	   }
+  }
+  post {
+      success {
+          emailext body: 'SUCCESS', subject: 's444018-training', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+      }
+      failure {
+          emailext body: 'FAILURE', subject: 's444018-training', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+      }
+      unstable {
+          emailext body: 'UNSTABLE', subject: 's444018-training', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+      }
+      changed {
+          emailext body: 'CHANGED', subject: 's444018-training', to: 'e19191c5.uam.onmicrosoft.com@emea.teams.ms'
+      }
+  }
+}

@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+    parameters{
+        buildSelector(
+            defaultSelector: lastSuccessful(),
+            name: 'BUILD_SELECTOR',
+            description: 'Which build to use for copying artifacts'
+        )
+    }
+    stages {
+        stage("Script") {
+            steps {
+		copyArtifacts fingerprintArtifacts: true, projectName: 's444018-create-dataset', selector: buildParameter('BUILD_SELECTOR')
+                sh 'chmod +x stats.sh'
+                sh " ./stats.sh"
+                archiveArtifacts 'stats.txt'
+            }
+        }
+    }
+}

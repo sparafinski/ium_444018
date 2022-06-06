@@ -1,0 +1,31 @@
+pipeline {
+    agent {
+        docker {
+			image 'docker_image'
+		}
+    }
+
+stages {
+
+	stage('checkout'){
+            steps{
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 's444018', url: 'https://git.wmi.amu.edu.pl/s444018/ium_444018.git']]])
+            }
+        }
+
+        stage("DVC"){
+		steps {
+            		withCredentials([sshUserPrivateKey(credentialsId: '48ac7004-216e-4260-abba-1fe5db753e18', keyFileVariable: 'IUM_SFTP_KEY')]) {
+                	sh 'dvc remote modify --local ium_ssh_remote keyfile $IUM_SFTP_KEY'
+			sh 'dvc remote modify --local ium_ssh_remote password IUM@2021'
+			sh 'dvc remote list'
+			sh 'cat .dvc/config'
+			sh 'cat .dvc/config.local'
+                	sh 'dvc pull'
+			sh 'dvc repro'
+			sh 'ls -al'
+		}
+            }
+        }
+    }
+}
