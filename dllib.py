@@ -51,7 +51,7 @@ def create_train_dev_test(imbd_data):
 
 
 def normalize_gross(imbd_data):
-    imbd_data[["Gross"]] = imbd_data[["Gross"]] / 10000000
+    imbd_data[["Gross"]] = imbd_data[["Gross"]] / 1000000
     return imbd_data
 
 
@@ -100,7 +100,7 @@ l = nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 
-num_epochs = 1000
+num_epochs = 2000
 # num_epochs = int(sys.argv[1])
 
 for epoch in range(num_epochs):

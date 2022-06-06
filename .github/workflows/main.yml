@@ -14,6 +14,7 @@ jobs:
           pip install -r requirements.txt
           python dllib.py
           python evaluate.py
+          python evaluate.py
 
           cat metrics.txt >> report.md
           cml-publish metrics.png --md >> report.md
